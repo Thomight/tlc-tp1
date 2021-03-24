@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+  docker-build:
+    build:
+      context: .
+      dockerfile: ./DockerFile_build
+    volumes:
+      - TP1:./lib
+      - TP1:./haarcascades
+      - TP1:./target/fatjar-0.0.1-SNAPSHOT.jar
+
+  docker-exec:
+    build:
+      context: .
+      dockerfile: ./DockerFile_exec
+    depends_on:
+      - docker-build
+    # volumes:
+    #   - TP1:.
+    ports:
+      - "8080:8080"
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  TP1:

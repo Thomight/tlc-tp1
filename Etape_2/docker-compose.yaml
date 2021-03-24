@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  resolvproxy:
+    image: jwilder/nginx-proxy
+    # container_name: resolvproxy
+    ports:
+      - "8080:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock
+
+  nginx:
+    image: nginx
+    environment:
+      - VIRTUAL_HOST=m
+    deploy:
+      replicas: 4

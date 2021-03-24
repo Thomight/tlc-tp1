@@ -1,0 +1,30 @@
+FROM openjdk:8-alpine as build
+
+RUN apk update &&\
+    apk add maven &&\
+    apk add git
+
+RUN git clone https://github.com/barais/TPDockerSampleApp
+WORKDIR /TPDockerSampleApp
+
+RUN mvn install:install-file -Dfile=./lib/opencv-3410.jar \
+    -DgroupId=org.opencv  -DartifactId=opencv -Dversion=3.4.10 -Dpackaging=jar
+RUN mvn package
+
+FROM openjdk:8-alpine
+EXPOSE 8080
+
+RUN apk update &&\
+    apk add libpng-dev &&\
+    # apk add opencv --repository=https://pkgs.alpinelinux.org/package/edge/testing/ &&\
+    # apk add libjasper1 &&\
+    # apk add musl &&\
+    # apk add libjpeg-turbo &&\
+    # apk add jasper --repository=https://pkgs.alpinelinux.org/package/v3.4/main/ &&\
+    apk add libdc1394-dev
+
+COPY --from=build /TPDockerSampleApp/lib ./lib
+COPY --from=build /TPDockerSampleApp/haarcascades ./haarcascades
+COPY --from=build /TPDockerSampleApp/target/fatjar-0.0.1-SNAPSHOT.jar ./fatjar-0.0.1-SNAPSHOT.jar
+
+CMD [ "java", "-Djava.library.path=lib/", "-jar", "fatjar-0.0.1-SNAPSHOT.jar" ]
