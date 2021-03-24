@@ -1,0 +1,2 @@
+docker build -f Dockerfile.ubuntu -t tlc/tp1_e3_ubu .
+docker run -p 8080:8080 -it tlc/tp1_e3_ubu
